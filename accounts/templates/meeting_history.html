@@ -3,41 +3,46 @@
 {% block title %}<title>Meeting History</title>{% endblock %}
 {% block nav %} 
 <div class="form-inline my-2 my-lg-0 ml-auto">
-        <h6 class="text-dark mx-3 my-auto">Hello, Admin</h6>
-        <a class="btn btn-primary mx-2" href="/dashboard" role="button">Dashboard</a>       
-  </div>
+    <h6 class="text-dark mx-3 my-auto">Hello, Admin</h6>
+    <a class="btn btn-primary mx-2" href="/dashboard" role="button">Dashboard</a>       
+</div>
 {% endblock %}
 {% block header %}
-<header class="masthead text-center" style="background:url('{% static '/img/bg-3.png' %}')no-repeat center center fixed;background-size:cover; height: 38rem;">
-    <h2 class='text-monospace text-light mx-5'>Today's Meeting History</h1>
-    <div class="container-fluid text-center" >
-            <table class="table table-light">
+<header class="masthead text-center" style="background:url('{% static '/img/bg-3.png' %}') no-repeat center center fixed; background-size:cover; height: 38rem;">
+    <h2 class='text-monospace text-light mx-5'>Today's Meeting History</h2>
+    <div class="container-fluid text-center">
+        <table class="table table-light">
             <thead class="thead-dark">
-              <TR>
-              <TH>Meeting Id</TH>
-              <TH>Visitor's Name</TH>
-              <TH>Visitor's Contact</TH>
-              <TH>Host Name</TH>
-              <TH>Time In</TH>
-              <TH>Time Out</TH>
-          </TR>
+                <tr>
+                    <th>Meeting Id</th>
+                    <th>Visitor's Name</th>
+                    <th>Visitor's Contact</th>
+                    <th>Host Name</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                </tr>
             </thead>
-              <tbody>
-                    {% for m in meeting %}
-                    <TR>
-                        <TD>{{ m.id}}</TD>
-                        <TD>{{ m.visitor_name}}</TD>
-                        <TD>{{ m.visitor_phone}}</TD>
-                        <TD>{{ m.host}}</TD>
-                        <TD>{{ m.time_in}}</TD>
-                        {% if m.time_out %}
-                        <TD>{{ m.time_out}}</TD>
-                        {% else %}
-                        <TD class="text-danger text-monospace"><strong>BUSY</strong></TD>
-                        {% endif %}
-                        </TR>
-                    {% endfor %}
-              </tbody>
-            </table>
-          </div>
+            <tbody>
+                {% for m in meetings %}
+                <tr>
+                    <td>{{ m.id }}</td>
+                    <td>{{ m.visitor_name }}</td>
+                    <td>{{ m.visitor_phone }}</td>
+                    <td>{{ m.host.host_name }}</td>  <!-- Updated to access host_name -->
+                    <td>{{ m.time_in }}</td>
+                    {% if m.time_out %}
+                    <td>{{ m.time_out }}</td>
+                    {% else %}
+                    <td class="text-danger text-monospace"><strong>BUSY</strong></td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No meetings today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</header>
 {% endblock %}
