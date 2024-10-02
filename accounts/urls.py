@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
 
     # Meeting management routes
-    path('meeting/', views.meeting_manager, name='meeting'),  # Manage meetings (view or create)
+    path('meeting/', views.meeting_manager, name='meeting_manager'),  # Manage meetings (view or create)
     path('save_meeting/', views.save_meeting, name='save_meeting'),  # Save a new meeting
 
     # Profile management routes

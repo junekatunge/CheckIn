@@ -14,9 +14,9 @@ class Host(models.Model):
     host_desc = models.CharField(max_length=50)
     address = models.CharField(max_length=100,default="HealthPlus, Rohini-22, New Delhi")
     status = models.BooleanField(default=True)
-    # available = models.CharField(max_length=50,default='')
+    available = models.CharField(max_length=50,default='')
     # current_meeting_id = models.IntegerField(blank=True, null=True)
-    # current_meeting = models.ForeignKey('Meeting', on_delete=models.SET_NULL, null=True, blank=True)
+    current_meeting = models.ForeignKey('Meeting', on_delete=models.SET_NULL, null=True, blank=True,related_name='current_host')
 
 
     # def __str__(self):
@@ -37,9 +37,9 @@ class Meeting(models.Model):
     visitor_phone = models.CharField(max_length=15)  # Changed to CharField for phone numbers
     visitor_type = models.CharField(max_length=10, choices=VISITOR_TYPE_CHOICES, default='GENERAL')
     host = models.ForeignKey(Host, on_delete=models.CASCADE, related_name='meetings')  # Added related_name to access all meetings related to a host
-    date = models.DateField(default=timezone.now)  # Use timezone.now for dynamic current date
-    time_in = models.TimeField(default=timezone.now)  # Use timezone.now for dynamic current time
-    time_out = models.TimeField(blank=True, null=True)
+    date = models.DateField(default=timezone.now)  # # Automatically set on creation
+    time_in = models.DateTimeField(auto_now_add=True)  # Use timezone.now for dynamic current time
+    time_out = models.DateTimeField(blank=True, null=True)  # Allow null for checkout time
 
     def send_notification_email(self):
         subject = f"Visitor {self.visitor_name} has checked in"

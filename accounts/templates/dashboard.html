@@ -35,38 +35,41 @@
     <div class="container">
             <div class="row">
             {% for p in hosts %}
-                <div class="col">       
                 <div class="col mx-auto mb-5">
-                            <div class="card text-dark" style="width: 14rem;">
-                                    <img src="/media/{{ p.host_image }}" class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                      <small class="text-primary font-weight-bolder">Profile Id : {{ p.id }}</small>
-                                      <h5 class="card-title">{{ p.host_name }}</h5>
-                                      <p class="card-text">{{ p.host_desc }}</p>
-                                    </div>
-                                <form action = "meeting/" method="post">{% csrf_token %}
-                                    <ul class="list-group list-group-flush">
-                                      {% if p.status %}
-                                        <li class="list-group-item bg-success text-white">FREE</li>
+                    <div class="card text-dark" style="width: 14rem;">
+                        <img src="/media/{{ p.host_image }}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <small class="text-primary font-weight-bolder">Profile Id : {{ p.id }}</small>
+                            <h5 class="card-title">{{ p.host_name }}</h5>
+                            <p class="card-text">{{ p.host_desc }}</p>
+                        </div>
+            
+                        <form action="{% url 'meeting_manager' %}" method="post">
+                            {% csrf_token %}
+                            <ul class="list-group list-group-flush">
+                                {% if p.status %}
+                                    <li class="list-group-item bg-success text-white">FREE</li>
+                                    <li class="list-group-item">
+                                        <button class="btn btn-primary mx-2" style="width: 90%;" type="submit" value="{{ p.id }}" name="meeting">Arrange Meeting</button>
+                                    </li>
+                                {% else %}
+                                    <li class="list-group-item bg-danger text-white">BUSY</li>
+                                    
+                                    <!-- Add conditional check for current meeting -->
+                                    {% if p.current_meeting %}
                                         <li class="list-group-item">
-                                            <button class="btn btn-primary mx-2" style="width: 90%;" type="submit" value="{{ p.id }}" name="meeting">Arrange Meeting</button>
+                                            <button class="btn btn-warning" style="width: 90%;" type="submit" value="{{ p.current_meeting.id }}" name="visitor">Current Visitor</button>
                                         </li>
-                                        {% else %}
-                                        <li class="list-group-item bg-danger text-white">BUSY</li>
-                                        <li class="list-group-item">
-                                        <button class="btn btn-warning" style="width: 90%;" type="submit" value="{{ p.current_meeting_id }}" name="visitor">Current Visitor</button>
-                                        </li>
-                                        {% endif %}
-                                      
-                                    </ul>
-                                    </form>
-                                  </div>
-                            
+                                    {% else %}
+                                        <li class="list-group-item bg-danger text-white">No Current Meeting</li>
+                                    {% endif %}
+                                {% endif %}
+                            </ul>
+                        </form>
                     </div>
                 </div>
-                {% endfor %}
-                </div>
-                </div>
+            {% endfor %}
+            
 
 <div id="profilemodal" class='modal fade' role="dialog">
     <div class="modal-dialog">
