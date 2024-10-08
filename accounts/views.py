@@ -11,7 +11,10 @@ from .forms import Meeting_form, Add_profile
 import datetime
 import requests
 import json
+import logging
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 
@@ -57,7 +60,7 @@ def verify(request):
             return redirect('/dashboard')
     else:
         return redirect('/dashboard')
-
+from django.shortcuts import render, redirect, get_object_or_404
 @login_required(login_url='/admin_login/')
 def meeting_manager(request):
     if request.method == 'POST':
@@ -121,7 +124,7 @@ def send_meeting_email(subject, instance, recipient_list):
     send_mail(
         subject,
         message,
-        'your_email@gmail.com',  # Replace with your Gmail address or the email you configured for sending
+        'jkatunge13@gmail.com',  # Replace with your Gmail address or the email you configured for sending
         recipient_list,
         fail_silently=False,
     )
@@ -135,6 +138,9 @@ def send_checkout_email(meeting):
     # Call the general email function
     send_email(subject, message, recipient_list)
 
+
+# Saves the visitor details filled in meeting form
+# Saves the visitor details filled in meeting form
 @login_required(login_url='/admin_login/')
 def save_meeting(request):
     if request.method == 'POST':
@@ -152,26 +158,33 @@ def save_meeting(request):
         form = Meeting_form(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)  # Don't save to the database yet
+
+            # Set current time and assign the host instance
+            instance.time_in = datetime.datetime.now()
+            instance.host = host  # Assign the Host object, not the name
             
-            # Assign the host instance to the meeting
-            instance.host = host  # Set the host instance
-            instance.time_in = timezone.now()  # Set current time
-            instance.save()  # Now save the instance to the database
+            # Save the meeting instance to the database
+            instance.save()
             
             # Update the host's current meeting
-            host.current_meeting = instance  # Update the current meeting
-            host.status = False  # Set status to not available
-            host.save()  # Save the host instance
-            
-            # Send email notifications
+            host.current_meeting_id = instance.id
+            host.status = False
+            host.save()
+
+            # Prepare email and SMS notifications
             rec = [host.host_email]
-            subject = f"{instance.visitor_name} Checked In!"
-            send_meeting_email(subject, instance, rec)  # Updated call
+            subject = instance.visitor_name + " Checked In!"
+            visitor = instance
+
+            # Send email and SMS notifications
+            email(subject, visitor, rec)
+            # sendsms(subject, visitor, host)
 
             messages.success(request, 'Information sent to Host, You will be called shortly!')
             return redirect('/dashboard')
         else:
             messages.error(request, 'There was an error with the form. Please correct it.')
+            return redirect('/dashboard')
     else:
         return redirect('/dashboard')
 
@@ -218,11 +231,11 @@ def save_meeting(request):
 #         return redirect('/dashboard')
 
 
-
+# Checkout function when Host clicks checkout button
 @login_required(login_url='/admin_login/')
 def checkout(request):
-    if request.method == 'POST':  # Ensure the request method is POST
-        meeting_id = request.POST.get('mid')  # Get the meeting ID from the form
+    if request.method == 'GET':  # Change to accept GET requests
+        meeting_id = request.GET.get('mid')  # Get meeting ID from the URL query parameter
 
         # Fetch the meeting using the ID
         meeting = get_object_or_404(Meeting, id=meeting_id)
@@ -246,9 +259,8 @@ def checkout(request):
         
         return HttpResponse(f"{meeting.visitor_name}, checked out successfully!")
     
-    return HttpResponse("Invalid request method.")  # Handle non-POST requests
+    return HttpResponse("Invalid request method.")  # Handle invalid methods
 
-from django.core.mail import send_mail
 
 def send_checkout_email(meeting):
     # Prepare the checkout notification email
@@ -260,8 +272,28 @@ def send_checkout_email(meeting):
     recipient_list = [meeting.visitor_email] if meeting.visitor_email else []
     
     # Send the email (ensure you have configured your email settings)
-    send_mail(subject, message, 'your_email@example.com', recipient_list, fail_silently=False)
+    send_mail(subject, message, 'jkatunge13@gmail.com', recipient_list, fail_silently=False)
 
+# Sends the email to both host and visitor
+def email(subject,visitor,rec,host=None):
+    ## FILL IN YOUR DETAILS HERE
+    sender = 'jkatunge13@gmail.com'
+    if host:
+        html_content = render_to_string('visitor_mail_template.html', {'visitor':visitor,'host':host}) # render with dynamic value
+    else:
+        html_content = render_to_string('host_mail_template.html', {'visitor':visitor}) # render with dynamic value
+    
+    text_content = strip_tags(html_content)
+
+    # try except block to avoid wesite crashing due to email error
+    try:
+        msg = EmailMultiAlternatives(subject, text_content, sender, rec)
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+        print(f"Email successfully sent to: {rec}")
+    except Exception as e:
+        logging.error(f"Error sending email to {rec}: {e}")
+        print(f"Failed to send email: {e}")  # To log and see the error during development
 
 
 # profile manager that saves host profile

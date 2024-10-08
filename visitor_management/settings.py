@@ -130,9 +130,10 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 ## FILL IN YOUR DETAILS HERE
 EMAIL_HOST_USER = 'jkatunge13@gmail.com'
-EMAIL_HOST_PASSWORD = 'wxyy rpym aakw mmss'
+EMAIL_HOST_PASSWORD = 'avkx bgws clqf kvsr'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 #EMAIL_USE_SSL = True
 
 ## Media folder setup
