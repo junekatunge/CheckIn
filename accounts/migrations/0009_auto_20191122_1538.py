@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='host',
             name='address',
-            field=models.CharField(default='HealthPlus, Rohini-22, New Delhi', max_length=100),
+            field=models.CharField(default='CheckMate, Rohini-22, New Delhi', max_length=100),
         ),
         migrations.AlterField(
             model_name='meeting',

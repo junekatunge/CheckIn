@@ -188,49 +188,6 @@ def save_meeting(request):
     else:
         return redirect('/dashboard')
 
-
-# # Saves the visitor details filled in meeting form
-# @login_required(login_url='/admin_login/')
-# def save_meeting(request):
-#     if request.method == 'POST':
-#         # Retrieve the host name from the form
-#         host_name = request.POST.get('host')
-        
-#         # Fetch the host instance using the host name
-#         try:
-#             host = Host.objects.get(host_name=host_name)
-#         except Host.DoesNotExist:
-#             messages.error(request, 'Host does not exist.')
-#             return redirect('/dashboard')
-
-#         # Create an instance of MeetingForm with POST data
-#         form = Meeting_form(request.POST)
-#         if form.is_valid():
-#             instance = form.save(commit=False)  # Don't save to the database yet
-            
-#             # Assign the host instance to the meeting
-#             instance.host = host  # Set the host instance
-#             instance.time_in = timezone.now()  # Set current time
-#             instance.save()  # Now save the instance to the database
-            
-#             # Update the host's current meeting
-#             host.current_meeting = instance  # Update the current meeting
-#             host.status = False  # Set status to not available
-#             host.save()  # Save the host instance
-            
-#             # Send email notifications
-#             rec = [host.host_email]
-#             subject = f"{instance.visitor_name} Checked In!"
-#             email(subject, instance, rec, host)
-
-#             messages.success(request, 'Information sent to Host, You will be called shortly!')
-#             return redirect('/dashboard')
-#         else:
-#             messages.error(request, 'There was an error with the form. Please correct it.')
-#     else:
-#         return redirect('/dashboard')
-
-
 # Checkout function when Host clicks checkout button
 @login_required(login_url='/admin_login/')
 def checkout(request):
@@ -339,9 +296,3 @@ def edit_delete(request):
             return redirect('/dashboard')
     return redirect('/dashboard')
 
-# def send_checkout_email(meeting):
-#     # Send a checkout notification email to the visitor
-#     subject = f"Visitor {meeting.visitor_name} Checked Out"
-#     message = f"Visitor {meeting.visitor_name} checked out at {meeting.time_out.strftime('%H:%M:%S')} on {meeting.date.strftime('%Y-%m-%d')}"
-#     recipient_list = [meeting.visitor_email] if meeting.visitor_email else []
-#     send_mail(subject, message, 'jkatunge13@gmail.com', recipient_list, fail_silently=False)

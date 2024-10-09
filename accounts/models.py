@@ -12,7 +12,7 @@ class Host(models.Model):
     host_phone = models.CharField(max_length=15)
     host_image = models.ImageField(upload_to='img/doctors')
     host_desc = models.CharField(max_length=50)
-    address = models.CharField(max_length=100,default="HealthPlus, Rohini-22, New Delhi")
+    address = models.CharField(max_length=100,default="CheckMate, Rohini-22, New Delhi")
     status = models.BooleanField(default=True)
     available = models.CharField(max_length=50,default='')
     # current_meeting_id = models.IntegerField(blank=True, null=True)

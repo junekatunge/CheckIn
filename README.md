@@ -1,4 +1,4 @@
-# HealthPlus-Visitor-Management-System
+# CheckMate-Visitor-Management-System
 A Visitor Management Web App made using Django.
 
 This is a simple web application which can be used for managing meetings and visitor details. It can keep track of all the meetings and can send emails and sms to host and visitor about their meeting details.
@@ -11,7 +11,7 @@ Being a web application **It also serves as an organisation's official website**
 Well !, as it also acts as an organisation's official website, so i took an example organisation. Also, its always better to explain with examples : )
 
 ## Visit deployed website
-- Deployed on pythonanywhere : http://healthplus.pythonanywhere.com/
+- Deployed on pythonanywhere : http://CheckMate.pythonanywhere.com/
 
 ### Watch Demo video (Recommended)
 - Visit - https://youtu.be/qxKQe9csSGA
