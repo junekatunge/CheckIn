@@ -1,6 +1,11 @@
 from django.db import models
 import datetime
 from django.utils import timezone
+from django.core.mail import send_mail 
+from background_task import background
+import threading
+
+
 
 # Create your models here.
 
@@ -40,22 +45,28 @@ class Meeting(models.Model):
     date = models.DateField(default=timezone.now)  # # Automatically set on creation
     time_in = models.DateTimeField(auto_now_add=True)  # Use timezone.now for dynamic current time
     time_out = models.DateTimeField(blank=True, null=True)  # Allow null for checkout time
+    
+    # New fields
+    queue_number = models.IntegerField(null=True, blank=True)  # Queue position
+    status = models.CharField(max_length=10, choices=[('waiting', 'Waiting'), ('completed', 'Completed')], default='waiting')
 
-    def send_notification_email(self):
-        subject = f"Visitor {self.visitor_name} has checked in"
-        message = f"Visitor Name: {self.visitor_name}\nVisitor Type: {self.visitor_type}\nCheck-in Time: {self.time_in.strftime('%H:%M:%S')}\nMeeting Date: {self.date.strftime('%Y-%m-%d')}"
-        recipient_list = [self.host.host_email]
-        if self.visitor_email:
-            recipient_list.append(self.visitor_email)
+
+    def schedule_queue_notification(self):
+        # Notify the visitor after 5 minutes
+        timer = threading.Timer(300, self.send_queue_notification)  # 300 seconds = 5 minutes
+        timer.start()
         
-        send_mail(
-            subject,
-            message,
-            'your_email@gmail.com',  # Change to your Gmail
-            recipient_list,
-            fail_silently=False,
-        )
-
+    def send_queue_notification(self):
+        # Logic to send notification (e.g., email or SMS) to the visitor
+        subject = "Your Queue Position"
+        message = f"Hello {self.visitor_name}, you are currently in position {self.get_queue_position()}."
+        send_mail(subject, message, 'from@example.com', [self.visitor_email])  # Adjust the from address
+     
+    def get_queue_position(self):
+        # Logic to determine the visitor's position in the queue
+        # For example, you might count how many meetings are scheduled before this one
+        return Meeting.objects.filter(time_in__lt=self.time_in).count() + 1
+    
     def __str__(self):
         return f"{self.visitor_name} - {self.host.host_name}"
 

@@ -141,6 +141,53 @@ def send_checkout_email(meeting):
 
 # Saves the visitor details filled in meeting form
 # Saves the visitor details filled in meeting form
+# @login_required(login_url='/admin_login/')
+# def save_meeting(request):
+#     if request.method == 'POST':
+#         # Retrieve the host name from the form
+#         host_name = request.POST.get('host')
+        
+#         # Fetch the host instance using the host name
+#         try:
+#             host = Host.objects.get(host_name=host_name)
+#         except Host.DoesNotExist:
+#             messages.error(request, 'Host does not exist.')
+#             return redirect('/dashboard')
+
+#         # Create an instance of MeetingForm with POST data
+#         form = Meeting_form(request.POST)
+#         if form.is_valid():
+#             instance = form.save(commit=False)  # Don't save to the database yet
+
+#             # Set current time and assign the host instance
+#             instance.time_in = datetime.datetime.now()
+#             instance.host = host  # Assign the Host object, not the name
+            
+#             # Save the meeting instance to the database
+#             instance.save()
+            
+#             # Update the host's current meeting
+#             host.current_meeting_id = instance.id
+#             host.status = False
+#             host.save()
+
+#             # Prepare email and SMS notifications
+#             rec = [host.host_email]
+#             subject = instance.visitor_name + " Checked In!"
+#             visitor = instance
+
+#             # Send email and SMS notifications
+#             email(subject, visitor, rec)
+#             # sendsms(subject, visitor, host)
+
+#             messages.success(request, 'Information sent to Host, You will be called shortly!')
+#             return redirect('/dashboard')
+#         else:
+#             messages.error(request, 'There was an error with the form. Please correct it.')
+#             return redirect('/dashboard')
+#     else:
+#         return redirect('/dashboard')
+
 @login_required(login_url='/admin_login/')
 def save_meeting(request):
     if request.method == 'POST':
@@ -159,27 +206,27 @@ def save_meeting(request):
         if form.is_valid():
             instance = form.save(commit=False)  # Don't save to the database yet
 
-            # Set current time and assign the host instance
+            # Set the check-in time and associate the host
             instance.time_in = datetime.datetime.now()
-            instance.host = host  # Assign the Host object, not the name
+            instance.host = host  # Assign the Host object
             
-            # Save the meeting instance to the database
+            # Save the meeting instance
             instance.save()
             
-            # Update the host's current meeting
-            host.current_meeting_id = instance.id
-            host.status = False
-            host.save()
+            # No need to update host's current meeting or status
+            # Host can have multiple meetings simultaneously
+            
+            # Schedule the queue notification
+            instance.schedule_queue_notification()
 
-            # Prepare email and SMS notifications
+            # Send email notification to the host and visitor
             rec = [host.host_email]
             subject = instance.visitor_name + " Checked In!"
             visitor = instance
 
             # Send email and SMS notifications
             email(subject, visitor, rec)
-            # sendsms(subject, visitor, host)
-
+            
             messages.success(request, 'Information sent to Host, You will be called shortly!')
             return redirect('/dashboard')
         else:
@@ -187,6 +234,8 @@ def save_meeting(request):
             return redirect('/dashboard')
     else:
         return redirect('/dashboard')
+
+
 
 # Checkout function when Host clicks checkout button
 @login_required(login_url='/admin_login/')
@@ -295,4 +344,3 @@ def edit_delete(request):
             messages.warning(request, 'Profile not found!')
             return redirect('/dashboard')
     return redirect('/dashboard')
-
