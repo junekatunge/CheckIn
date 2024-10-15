@@ -49,26 +49,37 @@ class Meeting(models.Model):
     # New fields
     queue_number = models.IntegerField(null=True, blank=True)  # Queue position
     status = models.CharField(max_length=10, choices=[('waiting', 'Waiting'), ('completed', 'Completed')], default='waiting')
-
+    notified = models.BooleanField(default=False)  # New field to track notifications
 
     def schedule_queue_notification(self):
-        # Notify the visitor after 5 minutes
         timer = threading.Timer(300, self.send_queue_notification)  # 300 seconds = 5 minutes
         timer.start()
         
     def send_queue_notification(self):
-        # Logic to send notification (e.g., email or SMS) to the visitor
         subject = "Your Queue Position"
         message = f"Hello {self.visitor_name}, you are currently in position {self.get_queue_position()}."
         send_mail(subject, message, 'from@example.com', [self.visitor_email])  # Adjust the from address
      
     def get_queue_position(self):
-        # Logic to determine the visitor's position in the queue
-        # For example, you might count how many meetings are scheduled before this one
-        return Meeting.objects.filter(time_in__lt=self.time_in).count() + 1
-    
+        # Count all meetings for this host that have not been checked out
+        position = Meeting.objects.filter(host=self.host, time_out__isnull=True).count()
+        return position
+
+    def notify_next_visitor(self):
+        if not self.notified:
+            # Corrected filtering to use isnull
+            next_meeting = Meeting.objects.filter(host=self.host, time_out__isnull=True).exclude(id=self.id).order_by('time_in').first()
+
+            if next_meeting:
+                position = next_meeting.get_queue_position()  # Get the correct position
+                subject = "You're Next in Line"
+                message = f"Hello {next_meeting.visitor_name}, you are now next in line to see {self.host.host_name}. Your current position is {position}."
+                try:
+                    send_mail(subject, message, 'from@example.com', [next_meeting.visitor_email])
+                    next_meeting.notified = True  # Mark as notified
+                    next_meeting.save()
+                except Exception as e:
+                    print(f"Failed to send notification email: {e}")  # Consider using logging instead
+
     def __str__(self):
         return f"{self.visitor_name} - {self.host.host_name}"
-
-    # def __str__(self):
-    #     return str(self.id)+ ' : ' + str(self.visitor_name)

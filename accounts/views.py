@@ -261,6 +261,9 @@ def checkout(request):
         host.status = True  # Set the host's status to available
         host.save()  # Save the updated host instance
 
+        # Notify the next visitor
+        meeting.notify_next_visitor()
+
         # Optionally, send a checkout notification email (if desired)
         send_checkout_email(meeting)
         
