@@ -15,6 +15,7 @@ import logging
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+import pytz
 
 # Create your views here.
 
@@ -269,11 +270,26 @@ def checkout(request):
 
 
 def send_checkout_email(meeting):
+
+    # Explicitly define the Africa/Nairobi timezone
+    nairobi_tz = pytz.timezone('Africa/Nairobi')
+
+    # Convert meeting.time_out to Africa/Nairobi timezone
+    if meeting.time_out:
+        local_time_out = meeting.time_out.astimezone(nairobi_tz)
+    else:
+        local_time_out = timezone.now().astimezone(nairobi_tz)  # Fallback if time_out is None
+
+    # Debug print for the time_out in different timezones
+    print(f"Original time_out (UTC): {meeting.time_out}")
+    print(f"Converted time_out (Nairobi): {local_time_out}")
+
     # Prepare the checkout notification email
     subject = f"Visitor {meeting.visitor_name} Checked Out"
     message = (
         f"Dear {meeting.visitor_name},\n"
-        f"You have successfully checked out at {meeting.time_out.strftime('%H:%M:%S')} on {meeting.date.strftime('%Y-%m-%d')}."
+        f"You have successfully checked out at {local_time_out.strftime('%H:%M:%S')} "
+        f"on {local_time_out.strftime('%Y-%m-%d')}."
     )
     recipient_list = [meeting.visitor_email] if meeting.visitor_email else []
     
