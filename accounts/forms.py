@@ -6,7 +6,7 @@ class Add_profile(forms.ModelForm):
     host_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','style':'width : 17rem','placeholder':'Name'}), required=True, max_length=50)
     host_email = forms.EmailField(widget=forms.EmailInput(attrs={'class':'form-control','style':'width : 17rem','placeholder':'Email Id'}), required=True, max_length=50)
     host_phone = forms.CharField(widget=forms.NumberInput(attrs={'class':'form-control','style':'width : 17rem','placeholder':'Phone Number'}), required=True, max_length=10)
-    host_image = forms.FileField(required = True)
+    host_image = forms.FileField(required = False)
     host_desc = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','style':'width : 17rem','placeholder':'Role'}), required=True, max_length=50)
     available = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','style':'width : 28rem','placeholder':'Monday - Friday'}), required=True, max_length=50)
 
