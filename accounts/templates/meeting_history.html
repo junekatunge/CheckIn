@@ -17,6 +17,7 @@
                     <th>Meeting Id</th>
                     <th>Visitor's Name</th>
                     <th>Visitor's Contact</th>
+                    <th>Visitor's National ID</th> 
                     <th>Host Name</th>
                     <th>Time In</th>
                     <th>Time Out</th>
@@ -28,6 +29,7 @@
                     <td>{{ m.id }}</td>
                     <td>{{ m.visitor_name }}</td>
                     <td>{{ m.visitor_phone }}</td>
+                    <td>{{ m.national_no }}</td>
                     <td>{{ m.host.host_name }}</td>  <!-- Updated to access host_name -->
                     <td>{{ m.time_in }}</td>
                     {% if m.time_out %}
