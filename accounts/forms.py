@@ -19,7 +19,8 @@ class Meeting_form(forms.ModelForm):
     visitor_name = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Name'}), required=True, max_length=50)
     visitor_email = forms.EmailField(widget=forms.EmailInput(attrs={'class':'form-control','placeholder':'Email Id'}), required=True, max_length=50)
     visitor_phone = forms.CharField(widget=forms.NumberInput(attrs={'class':'form-control','placeholder':'Phone Number'}), required=True, max_length=10)
+    national_no = forms.IntegerField(widget=forms.NumberInput(attrs={'class':'form-control','placeholder':'National ID'}), required=True)
     
     class Meta():
         model = Meeting
-        fields = ['visitor_name','visitor_email','visitor_phone']
+        fields = ['visitor_name','visitor_email','visitor_phone','national_no']
