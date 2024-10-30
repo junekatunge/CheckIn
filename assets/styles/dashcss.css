@@ -45,7 +45,7 @@
 *,
 :after,
 :before {
-    box-sizing: border-box
+    box-sizing:content-box
 }
 
 html {
@@ -468,7 +468,7 @@ hr {
     margin-top: 1rem;
     margin-bottom: 1rem;
     border: 0;
-    border-top: 1px solid rgba(0, 0, 0, .1)
+    /* border-top: 1px solid rgba(0, 0, 0, .1) */
 }
 
 .small,
@@ -1987,13 +1987,13 @@ pre code {
 .table-hover .table-active:hover,
 .table-hover .table-active:hover>td,
 .table-hover .table-active:hover>th {
-    background-color: rgba(0, 0, 0, .075)
+    background-color: rgba(255, 255, 255, 0.075)
 }
 
 .table .thead-dark th {
-    color: #fff;
-    background-color: #343a40;
-    border-color: #454d55
+    color: #000000;
+    background-color:white;
+    /* border-color: #454d55 */
 }
 
 .table .thead-light th {
@@ -2039,7 +2039,7 @@ pre code {
     }
 }
 
-@media (max-width:767.98px) {
+@media (max-width:907.98px) {
     .table-responsive-md {
         display: block;
         width: 100%;
@@ -2687,15 +2687,16 @@ fieldset:disabled a.btn {
 }
 
 .btn-primary {
+    font-size: 14px;
     color: #fff;
-    background-color: #007bff;
-    border-color: #007bff
+    background-color: #0058b6;
+    border-color: #0058b6
 }
 
 .btn-primary:hover {
     color: #fff;
-    background-color: #0069d9;
-    border-color: #0062cc
+    background-color: #0063ce;
+    border-color: #0063ce
 }
 
 .btn-primary.focus,
@@ -2706,16 +2707,16 @@ fieldset:disabled a.btn {
 .btn-primary.disabled,
 .btn-primary:disabled {
     color: #fff;
-    background-color: #007bff;
-    border-color: #007bff
+    background-color: #0063ce;
+    border-color: #0063ce
 }
 
 .btn-primary:not(:disabled):not(.disabled).active,
 .btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
     color: #fff;
-    background-color: #0062cc;
-    border-color: #005cbf
+    background-color: #0063ce;
+    border-color: #0063ce
 }
 
 .btn-primary:not(:disabled):not(.disabled).active:focus,
@@ -2839,7 +2840,8 @@ fieldset:disabled a.btn {
 }
 
 .btn-warning {
-    color: #212529;
+    font-size: 14px;
+    color: #ffffff;
     background-color: #ffc107;
     border-color: #ffc107
 }
@@ -2878,14 +2880,14 @@ fieldset:disabled a.btn {
 
 .btn-danger {
     color: #fff;
-    background-color: #dc3545;
-    border-color: #dc3545
+    background-color: #ff0019;
+    border-color: #ff0019
 }
 
 .btn-danger:hover {
     color: #fff;
-    background-color: #c82333;
-    border-color: #bd2130
+    background-color: #ff0019;
+    border-color: #ff0019
 }
 
 .btn-danger.focus,
@@ -2895,17 +2897,18 @@ fieldset:disabled a.btn {
 
 .btn-danger.disabled,
 .btn-danger:disabled {
+    font-size: 14px;
     color: #fff;
-    background-color: #dc3545;
-    border-color: #dc3545
+    background-color: #ff0019;
+    border-color: #ff0019
 }
 
 .btn-danger:not(:disabled):not(.disabled).active,
 .btn-danger:not(:disabled):not(.disabled):active,
 .show>.btn-danger.dropdown-toggle {
     color: #fff;
-    background-color: #bd2130;
-    border-color: #b21f2d
+    background-color: #ff0019;
+    border-color: #ff0019
 }
 
 .btn-danger:not(:disabled):not(.disabled).active:focus,
@@ -4919,7 +4922,9 @@ input[type=submit].btn-block {
     background-color: #fff;
     background-clip: border-box;
     border: 1px solid rgba(0, 0, 0, .125);
-    border-radius: .25rem
+    border-radius: .25rem;
+    margin-top: 100px;
+
 }
 
 .card>hr {
@@ -5416,7 +5421,7 @@ a.badge-warning:focus {
 
 .badge-danger {
     color: #fff;
-    background-color: #dc3545
+    background-color: #ff0019;
 }
 
 a.badge-danger:focus,
@@ -6982,6 +6987,7 @@ button.bg-secondary:hover {
 }
 
 .bg-success {
+    text-decoration: #FFFFFF !important;
     background-color: #28a745 !important
 }
 
@@ -6993,7 +6999,7 @@ button.bg-success:hover {
 }
 
 .bg-info {
-    background-color: #17a2b8 !important
+    background-color: #3EAF3F !important
 }
 
 a.bg-info:focus,
@@ -7537,7 +7543,8 @@ button.bg-dark:hover {
 
 .justify-content-center {
     -ms-flex-pack: center !important;
-    justify-content: center !important
+    justify-content: left !important
+    
 }
 
 .justify-content-between {
@@ -10727,7 +10734,8 @@ button.bg-dark:hover {
 }
 
 .text-monospace {
-    font-family: SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace !important
+    /* font-family: SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace !important */
+    font-family: 'Poppins', sans-serif
 }
 
 .text-justify {
@@ -10757,7 +10765,8 @@ button.bg-dark:hover {
 }
 
 .text-center {
-    text-align: center !important
+    text-align: center;
+    color: #000 !important
 }
 
 @media (min-width:576px) {
@@ -10911,7 +10920,10 @@ a.text-danger:hover {
 }
 
 .text-light {
-    color: #f8f9fa !important
+    color: #fff !important;
+    font-size: 15px;
+    margin: 0px 0px -50px -950px;
+    font-family: 'Poppins', sans-serif !important
 }
 
 a.text-light:focus,
@@ -10920,7 +10932,8 @@ a.text-light:hover {
 }
 
 .text-dark {
-    color: #343a40 !important
+    color: #FFFFFF
+    font-family: 'Poppins', sans-serif!important
 }
 
 a.text-dark:focus,
@@ -11090,15 +11103,15 @@ h6 {
 
 header.masthead {
     position: relative;
-    background-color: #343a40;
-    background-size: cover;
+    background-color: #fff;
+    /* background-size: cover; */
     padding-top: 8rem;
     padding-bottom: 8rem
 }
 
 header.masthead .overlay {
     position: absolute;
-    background-color: #212529;
+    /* background-color: #212529; */
     height: 100%;
     width: 100%;
     top: 0;
@@ -11112,7 +11125,7 @@ header.masthead h1 {
 
 @media (min-width:768px) {
     header.masthead {
-        padding-top: 12rem;
+        padding-top: 0rem;
         padding-bottom: 12rem
     }
 
@@ -11185,7 +11198,7 @@ header.masthead h1 {
     opacity: .3
 }
 
-footer.footer {
+/* footer.footer {
     padding-top: 4rem;
     padding-bottom: 4rem
-}
+}   */

@@ -5,176 +5,229 @@
 <meta http-equiv="refresh" content="20">
 <title>Dashboard</title>
 {% endblock %}
-{% block nav %} 
-<div class="form-inline my-2 my-lg-0 ml-auto" >
-        {% if user.is_authenticated %}
-        <a class="btn btn-dark mx-2" data-toggle='modal', data-target='#profilemodal' type="button" href="/dashboard" role="button">Profile Manager</a>
-        <a class="btn btn-dark mx-2" data-toggle='modal', data-target='#meetingmodal' type="button" href="/dashboard" role="button">Meeting History</a>
-        <a class="btn btn-danger mx-2" data-toggle='modal', data-target='#logoutmodal' type="button" href="/logout" role="button">Logout</a>
-        {% else %}
-        <a class="btn btn-success mx-2" href="/admin_login" role="button">Admin Login</a>
-        {% endif %}
-        
-  </div>
+{% block nav %}
+<div class="form-inline my-2 my-lg-0 ml-auto">
+
+    {% if user.is_authenticated %}
+    <a class="btn btn-dark mx-2" data-toggle='modal' , data-target='#profilemodal' type="button" href="/dashboard"
+        role="button">Profile Manager</a>
+    <a class="btn btn-dark mx-2" data-toggle='modal' , data-target='#meetingmodal' type="button" href="/dashboard"
+        role="button">Meeting History</a>
+    <a class="btn btn-danger mx-2" data-toggle='modal' , data-target='#logoutmodal' type="button" href="/logout"
+        role="button">Logout</a>
+    {% else %}
+    <a class="btn btn-success mx-2" href="/admin_login" role="button">Admin Login</a>
+    {% endif %}
+
+</div>
 {% endblock %}
 {% block header %}
-<header class="masthead text-white text-center" style="background:url('{% static '/img/bg-3.png' %}') center fixed;background-size:100% 100%;">
-    {% if messages %}
-    {% for msg in messages %}
-    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show mx-auto text-lg-left" style="width: 80%;" role="alert">
-            <strong> {{ msg }} </strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-    {% endfor  %}
-    {% endif %}
-    <div class="text-center">
-        <h1 class='text-monospace text-light'>SELECT YOUR HOST FOR MEETING</h1>
-    </div>
-    <hr class="bg-light" style="width: 70%;">
-    <div class="container">
-            <div class="row">
+<!-- <header class="masthead text-white text-center" style="background:url('{% static '/img/bg-3.png' %}') center fixed;background-size:100% 100%;"> -->
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{{ msg.tags }} alert-dismissible fade show mx-auto text-lg-left" style="width: 80%;"
+    role="alert">
+    <strong> {{ msg }} </strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+<div class="text-center1" style=" margin-top: 150px;margin-left: 190px;">
+    <h1 class='text1' style="color: rgb(0, 0, 0);font-size: 22px;font-weight:900;font-family: 'Poppins';">SELECT YOUR HOST FOR MEETING</h1>
+</div>
+
+
+
+<hr class="bg-light" style="">
+<div class="container" style="font-family: 'Poppins', sans-serif;font-size: 15px;">
+
+
+    <div class="columndashboard">
+
+
+
+        <div class="columndash" style="margin-top: -100px;">
             {% for p in hosts %}
-                <div class="col mx-auto mb-5">
-                    <div class="card text-dark" style="width: 14rem;">
-                        <img src="/media/{{ p.host_image }}" class="card-img-top" alt="...">
-                        <div class="card-body">
-                            <small class="text-primary font-weight-bolder">Profile Id : {{ p.id }}</small>
-                            <h5 class="card-title">{{ p.host_name }}</h5>
-                            <p class="card-text">{{ p.host_desc }}</p>
-                        </div>
-            
+
+            <div class="d-flex align-items-center border p-3 mb-2 bg-white rounded" style="height: 45px;">
+                <!-- Host Image -->
+                <div class="p-2">
+                    <img src="/media/{{ p.host_image }}" class="img-fluid rounded" style="width: 50px; height: 50px;"
+                        alt="Host Image">
+                </div>
+
+                <!-- Host Details -->
+                <div class="d-flex flex-grow-1 justify-content-between align-items-center">
+                    <div class="ml-3">
+                        <p class="mb-0"><strong>Profile ID:</strong> {{ p.id }}</p>
+                    </div>
+
+                    <div class="ml-3 truncate-text" style=" width: 120px;">
+                        <p class="mb-0"><strong>Name:</strong> {{ p.host_name }}</p> <!-- Truncated name -->
+                    </div>
+
+                    <div class="ml-3">
+                        <p class="mb-0"><strong>Rights:</strong> Director</p>
+                    </div>
+
+                    <!-- Availability -->
+                    <div>
+                        <strong>Availability:</strong>
+                        <span class="badge 
+                            {% if p.status %} badge-success {% else %} badge-danger {% endif %}" style="padding:10px;">
+                            {% if p.status %} Free {% else %} Busy {% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="ml-3">
                         <form action="{% url 'meeting_manager' %}" method="post">
                             {% csrf_token %}
-                            <ul class="list-group list-group-flush">
-                                {% if p.status %}
-                                    <li class="list-group-item bg-success text-white">FREE</li>
-                                    <li class="list-group-item">
-                                        <button class="btn btn-primary mx-2" style="width: 90%;" type="submit" value="{{ p.id }}" name="meeting">Arrange Meeting</button>
-                                    </li>
-                                {% else %}
-                                    <li class="list-group-item bg-danger text-white">BUSY</li>
-                                    
-                                    <!-- Add conditional check for current meeting -->
-                                    {% if p.current_meeting %}
-                                        <li class="list-group-item">
-                                            <button class="btn btn-warning" style="width: 90%;" type="submit" value="{{ p.current_meeting.id }}" name="visitor">Current Visitor</button>
-                                        </li>
-                                    {% else %}
-                                        <li class="list-group-item bg-danger text-white">No Current Meeting</li>
-                                    {% endif %}
-                                {% endif %}
-                            </ul>
+                            {% if p.status %}
+                            <button class="btn btn-primary" type="submit" value="{{ p.id }}" name="meeting">
+                                Arrange Meeting
+                            </button>
+                            {% else %}
+                            {% if p.current_meeting %}
+                            <button class="btn btn-warning" type="submit" value="{{ p.current_meeting.id }}"
+                                name="visitor">Current Visitor</button>
+                            {% else %}
+                            <button class="btn btn-danger" disabled>No Meeting</button>
+                            {% endif %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>
-            {% endfor %}
-            
-
-<div id="profilemodal" class='modal fade' role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content text-dark">
-            <div class="modal-header font-weight-bolder ">
-                    <h6 class="modal-title">Visitors are not allowed to use this !!</h6>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
             </div>
-            <form action = "verification/" method="post">{% csrf_token %}
-            <div class="modal-body">
-                    <div class="form-group row my-auto">
-                    <label for="inputPassword2" class="col-form-label mx-3">Enter Security password</label>
-                    <div class="ml-3">
-                    <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password"">
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <div class="row">
+
+
+        <div id="profilemodal" class='modal fade' role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content text-dark">
+                    <div class="modal-header font-weight-bolder ">
+                        <h6 class="modal-title">Visitors are not allowed to use this !!</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="verification/" method="post">{% csrf_token %}
+                        <div class="modal-body">
+                            <div class="form-group row my-auto">
+                                <label for="inputPassword2" class="col-form-label mx-3">Enter Security password</label>
+                                <div class="ml-3">
+                                    <input type="password" name="password" class="form-control"
+                                        id="exampleInputPassword1" placeholder="Password"">
                 </div>
                 </div>
                 
             </div>
-            <div class="modal-footer text-center">
-                <button class="btn bg-success btn-rounded text-light" name="profile" value="profile" type="submit">Verify</button>
+            <div class=" modal-footer text-center">
+                                    <button class="btn bg-success btn-rounded text-light" name="profile" value="profile"
+                                        type="submit" style="color: white;">Verify</button>
+                                </div>
+                    </form>
+                </div>
             </div>
-        </form>
         </div>
-    </div>
-</div>
 
 
-<div id="meetingmodal" class='modal fade' role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content text-dark">
-                <div class="modal-header font-weight-bolder ">
+        <div id="meetingmodal" class='modal fade' role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content text-dark">
+                    <div class="modal-header font-weight-bolder ">
                         <h6 class="modal-title">Visitors are not allowed to use this !!</h6>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
+                            <span aria-hidden="true">&times;</span>
                         </button>
-                </div>
-                <form action = "verification/" method="post">{% csrf_token %}
-                <div class="modal-body">
-                        <div class="form-group row my-auto">
-                        <label for="inputPassword2" class="col-form-label mx-3">Enter Security password</label>
-                        <div class="ml-3">
-                        <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password"">
+                    </div>
+                    <form action="verification/" method="post">{% csrf_token %}
+                        <div class="modal-body">
+                            <div class="form-group row my-auto">
+                                <label for="inputPassword2" class="col-form-label mx-3">Enter Security password</label>
+                                <div class="ml-3">
+                                    <input type="password" name="password" class="form-control"
+                                        id="exampleInputPassword1" placeholder="Password"">
                     </div>
                     </div>
                     
                 </div>
-                <div class="modal-footer text-center">
-                    <button class="btn bg-success btn-rounded text-light" name="meeting" value="meeting" type="submit">Verify</button>
+                <div class=" modal-footer text-center">
+                                    <button class="btn bg-success btn-rounded text-light" name="meeting" value="meeting"
+                                        type="submit">Verify</button>
+                                </div>
+                    </form>
                 </div>
-            </form>
             </div>
         </div>
-    </div>
 
-<div id="logoutmodal" class='modal fade' role="dialog">
+        <div id="logoutmodal" class='modal fade' role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content text-dark">
                     <div class="modal-header font-weight-bolder ">
-                            <h6 class="modal-title">Visitors are not allowed to use this !!</h6>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
+                        <h6 class="modal-title">Visitors are not allowed to use this !!</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <form action = "verification/" method="post">{% csrf_token %}
-                    <div class="modal-body">
+                    <form action="verification/" method="post">{% csrf_token %}
+                        <div class="modal-body">
                             <div class="form-group row my-auto">
-                            <label for="inputPassword2" class="col-form-label mx-3">Enter Security password</label>
-                            <div class="ml-3">
-                            <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password"">
+                                <label for="inputPassword2" class="col-form-label mx-3">Enter Security password</label>
+                                <div class="ml-3">
+                                    <input type="password" name="password" class="form-control"
+                                        id="exampleInputPassword1" placeholder="Password"">
                         </div>
                         </div>
                         
                     </div>
-                    <div class="modal-footer text-center">
-                        <button class="btn bg-success btn-rounded text-light" name="logout" value="logout" type="submit">Verify</button>
-                    </div>
-                </form>
+                    <div class=" modal-footer text-center">
+                                    <button class="btn bg-success btn-rounded text-light" name="logout" value="logout"
+                                        type="submit">Verify</button>
+                                </div>
+                    </form>
                 </div>
             </div>
         </div>
-</header>
-{% endblock %}
-{% block footer %}
-<footer class="footer bg-light" style="height: auto; width: auto;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6 my-auto h-100 text-center text-lg-left">
-                    <div class="row footer-bottom d-flex justify-content-between mb-2">
-                    <p class="text-muted small mx-3 mb-4 mb-lg-0">Innovaccer Summergeeks 2020.</p>
-                    <p class="col-lg-8 col-sm-12 text-muted small">
-                    Made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://github.com/shubhamkumar27" target="_blank">Shubham Kumar</a></p>
-                    </div>
-                </div>
-                    <div class="col-lg-6 my-auto h-100 text-center text-lg-right">
-                        <ul class="list-inline mb-0">
-                            <li class="list-inline-item"><a href="#"><i class="fa fa-github fa-2x fa-fw"></i></a></li>
-                            <li class="list-inline-item"><a href="#"><i class="fa fa-facebook fa-2x fa-fw"></i></a></li>
-                            <li class="list-inline-item"><a href="#"><i class="fa fa-twitter fa-2x fa-fw"></i></a></li>
-                            <li class="list-inline-item"><a href="#"><i class="fa fa-instagram fa-2x fa-fw"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-        </div>
-    </footer>
-{% endblock %}
+<style>
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full height to cover the entire screen */
+}
+     /* Footer Styling */
+     .footer {
+            /* background-color: #f0f0f0; */
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+            /* Push the footer to the bottom if there's space */
+            width: 100%;
+            color: #000000;
+
+        }
+</style>
+
+        </header>
+        {% endblock %}
+        {% block footer %}
+        <footer class="footer">
+            <p>&copy; Copyright 2021. The National Treasury. All Rights Reserved.</p>
+        </footer>
+        {% endblock %}

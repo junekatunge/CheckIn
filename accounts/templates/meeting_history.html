@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}<title>Meeting History</title>{% endblock %}
-{% block nav %} 
+
+{% block title %}
+Meeting History
+{% endblock %}
+
+{% block nav %}
 <div class="form-inline my-2 my-lg-0 ml-auto">
     <h6 class="text-dark mx-3 my-auto">Hello, Admin</h6>
-    <a class="btn btn-primary mx-2" href="/dashboard" role="button">Dashboard</a>       
+    <a class="btn btn-primary mx-2" href="/dashboard" role="button">Dashboard</a>
 </div>
 {% endblock %}
+
 {% block header %}
 <header class="masthead text-center" style="background:url('{% static '/img/bg-3.png' %}') no-repeat center center fixed; background-size:cover; height: 38rem;">
     <h2 class='text-monospace text-light mx-5'>Today's Meeting History</h2>
@@ -46,5 +51,99 @@
             </tbody>
         </table>
     </div>
+
+
+
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Centered and Adaptable Table Container */
+        .table-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+            /* Small padding for mobile view */
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        a {
+            text-decoration: none;
+            color: #1a73e8;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Meeting Row Styling */
+        .meeting-row td {
+            padding: 20px;
+        }
+
+        /* Footer Styling */
+        .footer {
+            /* background-color: #f0f0f0; */
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+            /* Push the footer to the bottom if there's space */
+            width: 100%;
+            color: #000000;
+
+        }
+
+        /* Media Queries for Small Screens */
+        @media (max-width: 768px) {
+            .table-container {
+                padding: 0 10px;
+            }
+
+            .table {
+                display: block;
+                overflow-x: auto;
+                /* Enable horizontal scroll on small screens */
+                white-space: nowrap;
+            }
+
+            th,
+            td {
+                padding: 12px;
+            }
+        }
+    </style>
 </header>
+<footer class="footer">
+    <p>&copy; Copyright 2021. The National Treasury. All Rights Reserved.</p>
+</footer>
 {% endblock %}
