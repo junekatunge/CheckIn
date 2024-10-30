@@ -1,107 +1,251 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}<title>Profile Manager</title>{% endblock %}
-{% block nav %} 
+{% block nav %}
 <div class="form-inline my-2 my-lg-0 ml-auto">
-        <h6 class="text-dark mx-3 my-auto">Hello, Admin</h6>
-        <a class="btn btn-primary mx-2" href="/dashboard" role="button">Dashboard</a>
-  </div>
+    <h6 class="text-dark mx-3 my-auto">Hello, Admin</h6>
+    <a class="btn btn-primary mx-2" href="/dashboard" role="button">Dashboard</a>
+</div>
 {% endblock %}
 {% block header %}
-<header class="masthead text-white text-center " style="background:url('{% static '/img/bg.jpeg' %}')no-repeat center center fixed;background-size:cover; height: cover">
+<!-- <div class="text-center" style=" margin-top: 150px; margin-left: -20px;">
+    <h1 class='text-monospace text-light' style="color: black;">PROFILE MANAGER</h1>
+</div> -->
+
+<div class="text-center1" style=" margin-top: 150px;margin-left: 150px;">
+    <h1 class='text1' style="color: rgb(0, 0, 0);font-size: 22px;font-weight:900;font-family: 'Poppins';">PROFILE
+        MANAGER</h1>
+</div>
+
+<header class="body">
     {% if messages %}
     {% for msg in messages %}
-    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show mx-auto text-lg-left" style="width: 80%;" role="alert">
-            <strong> {{ msg }} </strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-    {% endfor  %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show mx-auto text-lg-left" style="" role="alert">
+        <strong>{{ msg }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
     {% endif %}
-    
-    <div class="container">
-        <div class="row">
-            <div class="card mx-auto" style="width: 40rem; display: inline-block;">
-                <h5 class="card-header bg-info text-monospace text-center">
-                    <strong class="text-center">Add Profile Details</strong>
-                </h5>
-            
-                <div class="card-body px-lg-5 mt-2">
-                    {% if edit %}
-                    <form class="text-center" style="color: #757575;" action="/dashboard/edit_profile/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-                    {% else %}
-                    <form class="text-center" style="color: #757575;" action="/dashboard/profile_manager/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-                    {% endif %}
-                        <div class="form-row">
-                            <div class="col">
-                            <div class="row">                                
-                                <div class="md-form mx-auto" style="display:inline-block;">
-                                    {{ form.host_name }}
-                                </div>
-                                <div class="md-form mx-auto" style="display:inline-block;">
-                                    {{ form.host_desc }}
-                                </div>
-                            </div>
-                            </div>
-                        </div>
 
-                        <div class="row my-3">
-                                <div class="md-form mx-auto" style="display:inline-block;">
-                                        {{ form.host_email }}
-                                </div>                                
-                                <div class="md-form mx-auto" style="display:inline-block;">
-                                    {{ form.host_phone }}
-                                </div>
-                            </div>
-                        <div class="row my-3">
-                        <label class="ml-3 mt-2" style="display: inline-block;">Availability :</label>
-                        <div class="md-form mx-auto" style="display:inline-block;">
-                                {{ form.available }}    
-                            </div>
-                        </div>
-                        <div class="row text-monospace mt-2 text-dark" style="margin-left: 9rem;">
-                                <small class="font-weight-bold text-danger">(Please upload square fit images only)</small>  
-                            </div>
-                        <div class="row mt-3">
-                        <label class="ml-4" style="display: inline-block;">Image :</label>
-                        <div class="md-form ml-2" style="display:inline-block;">
-                                {{ form.host_image }}    
-                            </div>
-                            {% if edit %}
-                            <button class="btn bg-warning mx-auto btn-rounded waves-effect z-depth-0" value="{{ info }}" name="editing" type="submit" style="width: 7rem; display:inline-block;">Save</button>
-                            {% else %}
-                            <button class="btn bg-success mx-auto btn-rounded waves-effect z-depth-0 text-light" type="submit" style="width: 7rem; display:inline-block;">Save</button>
-                            {% endif %}
-                        </div>
-                    </form>
+    <div class="section-form " style="margin-top: -50px;">
+        <div class="section">
+            <div class="form-header">Add Profile Details</div>
 
-                </div>
-                </div>
-                <div class="card mx-auto" style="width: 20rem; display: inline-block;">
-                        <h5 class="card-header bg-info text-monospace text-light text-center">
-                            <strong>Edit or Delete Profile</strong>
-                        </h5>
-                    
-                        <div class="card-body px-lg-5">
-                    
-                            <form class="text-center" style="color: #757575;" action="/dashboard/edit_delete/" method="POST" enctype="multipart/form-data">{% csrf_token %}
-                                <h6 class="text-center text-dark">Enter profile ID of host</h6>
-                                <div class="form-row my-2">
-                                        <div class="md-form mx-auto my-2" style="display:inline-block;">
-                                            <input type="text" class="form-control" style="width: 14rem;" name = "id" placeholder="Enter Profile Id">
-                                        </div>
-                                </div>
-                                <button class="btn bg-warning mx-auto mt-4 mb-2 btn-rounded waves-effect z-depth-0" type="submit" value="edit" name="edit" style="width: 10rem;">Edit</button>
-                                <div class="row text-monospace mt-1 mb-2 text-dark">
-                                        <small class="font-weight-bold text-danger">(Please reconsider,it cannot be recovered once deleted)</small>  
-                                    </div>
-                                <button class="btn bg-danger mx-auto btn-rounded waves-effect z-depth-0 text-light" type="submit" value="delete" name="delete" style="width: 10rem;">Delete</button>
-                            </form>
-                        </div>
-                </div>
+            <div class="form">
+                <form class="text-center"
+                    action="{% if edit %}/dashboard/edit_profile/{% else %}/dashboard/profile_manager/{% endif %}"
+                    method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="input-row">
+                        {{ form.host_name }}
+                        {{ form.host_email }}
+                        {{ form.host_phone }}
+
+                    </div>
+
+                    <div class="input-row">
+                        {{ form.host_desc }}
+                        {{ form.available }}
+                        <div class="md-form"> {{ form.host_image }} </div>
+                    </div>
+                    <!-- 
+                    <label class="image-label">Image :</label> -->
+                    <!-- <div class="md-form">
+                        {{ form.host_image }}
+                    </div> -->
+                    <button class="btn-save" style="margin-top: 20px;" type="submit">
+                        {% if edit %}Save{% else %}Save{% endif %}
+                    </button>
+                </form>
             </div>
+        </div>
+
+
+
+
+
+        <div class="section2">
+            <h5 class="section-header">Edit or Delete Profile</h5>
+            <div class="form2">
+
+                <div class="spacing" style="padding-top: 20px;">
+                    <small class="font-weight-bold text-danger" style="padding: 20px;"> (Please reconsider, it cannot be
+                        recovered once
+                        deleted)</small>
+                </div>
+
+
+                <form class="text-center" action="/dashboard/edit_delete/" method="POST">
+                    {% csrf_token %}
+                    <div class="input-row" style="padding: 20px;">
+                        <input type="text" class="form-control profile-id" name="id" placeholder="Enter Profile Id">
+                        <button class="btn-edit" type="submit" value="edit" name="edit">Edit</button>
+                        <button class="btn-delete" type="submit" value="delete" name="delete">Delete</button>
+
+
+                    </div>
+
+                </form>
             </div>
+
+        </div>
+
+        <footer>
+            © Copyright 2021. The National Treasury. All Rights Reserved.
+        </footer>
+
+    </div>
 </header>
-{% endblock %}
 
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif !important;
+        /* background-color: #f5f5f5; */
+    }
+
+    .md-form {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        ;
+    }
+
+
+    .section-form {
+
+        margin: 0px auto;
+        max-width: 1200px;
+        padding-bottom: -40px;
+        /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    }
+
+    .section {
+        background-color: #fff;
+        border-radius: 5px;
+        margin-top: 100px;
+        margin-bottom: 50px;
+        padding: 0px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .section2 {
+        background-color: #fff;
+        border-radius: 5px;
+        margin-top: 50px;
+        margin-bottom: 50px;
+        padding: 0px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-header {
+        background-color: black;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        font-size: 18px;
+        border-radius: 5px 5px 0 0;
+        /* text-align: center; */
+    }
+
+    .form-header {
+        background-color: black;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+        /* text-align: center; */
+        border-radius: 5px 5px 0 0;
+    }
+
+    .form {
+        padding: 20px;
+    }
+
+    .input-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+        align-items: center;
+        /* Align items vertically centered */
+    }
+
+    .input-row input {
+        flex: 1;
+        /* Allow inputs to take equal space in the row */
+        min-width: 200px;
+        /* Minimum width to ensure usability */
+        max-width: 350px;
+        /* Maximum width for larger screens */
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .availability-label,
+    .image-label {
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+
+
+    .btn-edit,
+    .btn-delete {
+        padding: 10px 60px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin: 15px;
+        display: inline-block;
+    }
+
+    .btn-edit {
+        background-color: #FFC107;
+        color: black;
+        border: none;
+    }
+
+    .btn-delete {
+        background-color: #F44336;
+        color: white;
+        border: none;
+    }
+
+    .btn-save {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 50px;
+        cursor: pointer;
+        border-radius: 5px;
+        display: block;
+        margin: 0 auto;
+        margin-top: 10px;
+    }
+
+    /* Footer Styling */
+    footer {
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        font-size: 12px;
+        color: #888;
+    }
+
+
+    @media (max-width: 768px) {
+        .input-row {
+            flex-direction: column;
+        }
+
+        .input-row input {
+            width: 100%;
+            /* Full width on smaller screens */
+        }
+    }
+</style>
+{% endblock %}
