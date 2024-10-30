@@ -13,43 +13,43 @@ Meeting History
 {% endblock %}
 
 {% block header %}
-<header class="masthead" style="margin-top: 100px; background: none;">
-    <h2 class="head4" style="font-family: 'Poppins', sans-serif;display: flex;margin-left: 150px;">Meeting History</h2>
-    <div class="table-container">
-        <div class="table-responsive" style="font-family: 'Poppins', sans-serif;">
-            <table class="table">
-                <thead class="thead-dark">
-                    <tr style="background-color: #f0f0f0;">
-                        <th>Meeting Id</th>
-                        <th>Visitor's Name</th>
-                        <th>Visitor's Contact</th>
-                        <th>Host Name</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in meetings %}
-                    <tr class="meeting-row" style="font-family: 'Poppins', sans-serif;font-weight:400;font-size: 15px;">
-                        <td><a href="#">{{ m.id }}</a></td>
-                        <td>{{ m.visitor_name }}</td>
-                        <td>{{ m.visitor_phone }}</td>
-                        <td>{{ m.host.host_name }}</td>
-                        <td>{{ m.time_in }}</td>
-                        {% if m.time_out %}
-                        <td>{{ m.time_out }}</td>
-                        {% else %}
-                        <td class="text-danger font-weight-bold">BUSY</td>
-                        {% endif %}
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="text-center font-italic">No meetings today.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<header class="masthead text-center" style="background:url('{% static '/img/bg-3.png' %}') no-repeat center center fixed; background-size:cover; height: 38rem;">
+    <h2 class='text-monospace text-light mx-5'>Today's Meeting History</h2>
+    <div class="container-fluid text-center">
+        <table class="table table-light">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Meeting Id</th>
+                    <th>Visitor's Name</th>
+                    <th>Visitor's Contact</th>
+                    <th>Visitor's National ID</th> 
+                    <th>Host Name</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in meetings %}
+                <tr>
+                    <td>{{ m.id }}</td>
+                    <td>{{ m.visitor_name }}</td>
+                    <td>{{ m.visitor_phone }}</td>
+                    <td>{{ m.national_no }}</td>
+                    <td>{{ m.host.host_name }}</td>  <!-- Updated to access host_name -->
+                    <td>{{ m.time_in }}</td>
+                    {% if m.time_out %}
+                    <td>{{ m.time_out }}</td>
+                    {% else %}
+                    <td class="text-danger text-monospace"><strong>BUSY</strong></td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No meetings today.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 

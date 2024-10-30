@@ -96,8 +96,20 @@
 
 
 
-              <button class="btn bg-info btn-rounded my-2 waves-effect z-depth-0 text-light" type="submit"
-                value="{{ host.host_name }}" name="host" style="width: 10rem;">
+                  <div class="md-form my-3">
+                    {{ form.national_no }}
+                  </div>
+              
+              
+              
+
+              <button
+                class="btn bg-info btn-rounded my-2 waves-effect z-depth-0 text-light"
+                type="submit"
+                value="{{ host.host_name }}"
+                name="host"
+                style="width: 10rem;"
+              >
                 Check In
               </button>
             </form>

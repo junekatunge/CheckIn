@@ -15,7 +15,7 @@ class Host(models.Model):
     host_name = models.CharField(max_length=50)
     host_email = models.EmailField(blank=True, null=True)
     host_phone = models.CharField(max_length=15)
-    host_image = models.ImageField(upload_to='img/doctors')
+    host_image = models.ImageField(upload_to='img/doctors',default='img/doctors/profile_default.png')
     host_desc = models.CharField(max_length=50)
     address = models.CharField(max_length=100,default="CheckMate, Rohini-22, New Delhi")
     status = models.BooleanField(default=True)
@@ -37,6 +37,7 @@ class Meeting(models.Model):
         ('BUSINESS', 'Business'),
     ]
 
+    national_no = models.IntegerField(max_length=20, unique=False) #added a new field
     visitor_name = models.CharField(max_length=50)
     visitor_email = models.EmailField(blank=True, null=True)
     visitor_phone = models.CharField(max_length=15)  # Changed to CharField for phone numbers
