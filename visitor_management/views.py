@@ -6,7 +6,7 @@ from accounts.models import Host
 
 ## Homepage
 def home(request):
-    return render(request, 'homepage.html')
+    return render(request, 'admin_login.html')
 
 ## Doctors details for visitors
 def doctors(request):
