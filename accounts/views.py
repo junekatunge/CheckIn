@@ -1,293 +1,141 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
-from django.contrib.auth.models import User, auth
-from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth.models import auth
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.contrib.auth.decorators import login_required
 from .models import Host, Meeting
 from .forms import Meeting_form, Add_profile
-import datetime
-import requests
-import json
-import logging
-from django.utils import timezone
-from django.core.mail import send_mail
-from django.conf import settings
 import pytz
+import logging
 
-# Create your views here.
-
+# -------------------------------------------
+# DASHBOARD
+# -------------------------------------------
 @login_required(login_url='/admin_login/')
 def dashboard(request):
-    # Fetch all hosts and order them by name for display
     hosts = Host.objects.all().order_by('host_name')
-    # Fetch meetings related to the hosts
     meetings = Meeting.objects.all()
+    return render(request, 'dashboard.html', {'hosts': hosts, 'meetings': meetings})
 
-    # Prepare the context with hosts and meetings
-    context = {
-        'hosts': hosts,
-        'meetings': meetings,
-    }
-
-    return render(request, 'dashboard.html', {'hosts': hosts})
-
+# -------------------------------------------
+# VERIFY FUNCTION
+# -------------------------------------------
 @login_required(login_url='/admin_login/')
 def verify(request):
     if request.method == 'POST':
         key = request.POST.get('password')
         user = auth.authenticate(username=request.user.username, password=key)
-        if user is not None:
-            # If verifying profile, render profile manager
+        if user:
             if request.POST.get('profile'):
                 form = Add_profile()
                 return render(request, 'profile_manager.html', {'form': form})
-
-            # If logging out, redirect to home
             if request.POST.get('logout'):
                 auth.logout(request)
                 return redirect('/')
-
-            # If checking meeting history, fetch today's meetings
             if request.POST.get('meeting'):
-                today = timezone.now().date()  # Get today's date
-                meetings = Meeting.objects.filter(date=today)  # Use __date lookup to compare only the date part
+                today = timezone.now().date()
+                meetings = Meeting.objects.filter(date=today)
                 return render(request, 'meeting_history.html', {'meetings': reversed(list(meetings))})
         else:
-            # If credentials are invalid, show a warning
             messages.warning(request, 'Please enter valid credentials!')
             return redirect('/dashboard')
-    else:
-        return redirect('/dashboard')
-from django.shortcuts import render, redirect, get_object_or_404
+    return redirect('/dashboard')
+
+# -------------------------------------------
+# MEETING MANAGER
+# -------------------------------------------
 @login_required(login_url='/admin_login/')
 def meeting_manager(request):
     if request.method == 'POST':
-        # If visitor button is clicked, visitor details are shown
-        if request.POST.get("visitor"): 
+        if request.POST.get("visitor"):
             meeting_id = request.POST.get("visitor")
-
-            print(f"Visitor Button Clicked. Meeting ID: {meeting_id}")  # Debugging
-            
             try:
                 meeting = Meeting.objects.get(id=meeting_id)
-                host = Host.objects.get(current_meeting=meeting)  # Using current_meeting ForeignKey
-
-                print(f"Meeting Retrieved: {meeting.visitor_name}, Host: {host.host_name}")
-                
+                host = Host.objects.get(current_meeting=meeting)
             except Meeting.DoesNotExist:
                 messages.error(request, 'Meeting not found.')
                 return redirect('/dashboard')
             except Host.DoesNotExist:
                 messages.error(request, 'Host not found.')
                 return redirect('/dashboard')
-
-            # Render visitor details template
-            meeting_details = {'meeting': meeting, 'host': host}
-
-            # Debugging: Check what data is passed to the template
-            print(f"Meeting Details Passed to Template: {meeting_details}")
-            
-            return render(request, 'visitor_details.html', meeting_details)
-
-        # If meeting button is clicked, open the meeting form
-        elif request.POST.get("meeting"): 
+            return render(request, 'visitor_details.html', {'meeting': meeting, 'host': host})
+        elif request.POST.get("meeting"):
             host_id = request.POST.get("meeting")
-
             try:
                 host = Host.objects.get(id=host_id)
             except Host.DoesNotExist:
                 messages.error(request, 'Host not found.')
                 return redirect('/dashboard')
-
             form = Meeting_form()
-            param = {'form': form, 'host': host}
-            return render(request, 'meeting_form.html', param)
-
+            return render(request, 'meeting_form.html', {'form': form, 'host': host})
         else:
             messages.error(request, 'Invalid request.')
             return redirect('/dashboard')
-    
     else:
         meetings = Meeting.objects.all()
         hosts = Host.objects.all()
         return render(request, 'meeting_list.html', {'meetings': meetings, 'hosts': hosts})
 
-from django.core.mail import send_mail
-
-def send_meeting_email(subject, instance, recipient_list):
-    # Prepare the email message
-    message = f"Visitor {instance.visitor_name} has checked in at {instance.time_in.strftime('%H:%M:%S')} on {instance.date.strftime('%Y-%m-%d')}."
-    
-    # Send the email
-    send_mail(
-        subject,
-        message,
-        'jkatunge13@gmail.com',  # Replace with your Gmail address or the email you configured for sending
-        recipient_list,
-        fail_silently=False,
-    )
-
-def send_checkout_email(meeting):
-    # Prepare the email subject and message
-    subject = f"Visitor {meeting.visitor_name} Checked Out"
-    message = f"Visitor {meeting.visitor_name} checked out at {meeting.time_out.strftime('%H:%M:%S')} on {meeting.date.strftime('%Y-%m-%d')}."
-    recipient_list = [meeting.visitor_email] if meeting.visitor_email else []
-    
-    # Call the general email function
-    send_email(subject, message, recipient_list)
-
-
-# Saves the visitor details filled in meeting form
-# Saves the visitor details filled in meeting form
-# @login_required(login_url='/admin_login/')
-# def save_meeting(request):
-#     if request.method == 'POST':
-#         # Retrieve the host name from the form
-#         host_name = request.POST.get('host')
-        
-#         # Fetch the host instance using the host name
-#         try:
-#             host = Host.objects.get(host_name=host_name)
-#         except Host.DoesNotExist:
-#             messages.error(request, 'Host does not exist.')
-#             return redirect('/dashboard')
-
-#         # Create an instance of MeetingForm with POST data
-#         form = Meeting_form(request.POST)
-#         if form.is_valid():
-#             instance = form.save(commit=False)  # Don't save to the database yet
-
-#             # Set current time and assign the host instance
-#             instance.time_in = datetime.datetime.now()
-#             instance.host = host  # Assign the Host object, not the name
-            
-#             # Save the meeting instance to the database
-#             instance.save()
-            
-#             # Update the host's current meeting
-#             host.current_meeting_id = instance.id
-#             host.status = False
-#             host.save()
-
-#             # Prepare email and SMS notifications
-#             rec = [host.host_email]
-#             subject = instance.visitor_name + " Checked In!"
-#             visitor = instance
-
-#             # Send email and SMS notifications
-#             email(subject, visitor, rec)
-#             # sendsms(subject, visitor, host)
-
-#             messages.success(request, 'Information sent to Host, You will be called shortly!')
-#             return redirect('/dashboard')
-#         else:
-#             messages.error(request, 'There was an error with the form. Please correct it.')
-#             return redirect('/dashboard')
-#     else:
-#         return redirect('/dashboard')
-
+# -------------------------------------------
+# SAVE MEETING
+# -------------------------------------------
 @login_required(login_url='/admin_login/')
 def save_meeting(request):
     if request.method == 'POST':
-        # Retrieve the host name from the form
         host_name = request.POST.get('host')
-        
-        # Fetch the host instance using the host name
         try:
             host = Host.objects.get(host_name=host_name)
         except Host.DoesNotExist:
             messages.error(request, 'Host does not exist.')
             return redirect('/dashboard')
 
-        # Create an instance of MeetingForm with POST data
         form = Meeting_form(request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)  # Don't save to the database yet
+            instance = form.save(commit=False)
+            instance.time_in = timezone.now()
+            instance.host = host
+            instance.save()  # 🚀 This handles queue + notifies first visitor automatically
 
-            # Set the check-in time and associate the host
-            instance.time_in = datetime.datetime.now()
-            instance.host = host  # Assign the Host object
-            
-            # Save the meeting instance
-            instance.save()
-            
-            # No need to update host's current meeting or status
-            # Host can have multiple meetings simultaneously
-            
-            # Schedule the queue notification
-            instance.schedule_queue_notification()
+            rec = [host.host_email] if host.host_email else []
+            subject = f"{instance.visitor_name} Checked In!"
+            email(subject, instance, rec)
 
-            # Send email notification to the host and visitor
-            rec = [host.host_email]
-            subject = instance.visitor_name + " Checked In!"
-            visitor = instance
-
-            # Send email and SMS notifications
-            email(subject, visitor, rec)
-            
-            messages.success(request, 'Information sent to Host, You will be called shortly!')
+            messages.success(request, 'Information sent to Host. You will be called shortly!')
             return redirect('/dashboard')
         else:
-            messages.error(request, 'There was an error with the form. Please correct it.')
+            messages.error(request, 'Form error. Please correct it.')
             return redirect('/dashboard')
-    else:
-        return redirect('/dashboard')
+    return redirect('/dashboard')
 
-
-
-# Checkout function when Host clicks checkout button
+# -------------------------------------------
+# CHECKOUT MEETING
+# -------------------------------------------
 @login_required(login_url='/admin_login/')
 def checkout(request):
-    if request.method == 'GET':  # Change to accept GET requests
-        meeting_id = request.GET.get('mid')  # Get meeting ID from the URL query parameter
-
-        # Fetch the meeting using the ID
+    if request.method == 'GET':
+        meeting_id = request.GET.get('mid')
         meeting = get_object_or_404(Meeting, id=meeting_id)
-        
-        # Check if the visitor has already checked out
+
         if meeting.time_out:
-            return HttpResponse(f"{meeting.visitor_name}, already checked out!")
-        
-        # Set the checkout time
-        meeting.time_out = timezone.now()  # Capture the current time as checkout time
-        meeting.save()  # Save the updated meeting instance
-        
-        # Update the host's status and current meeting
-        host = meeting.host  # Get the associated host
-        host.current_meeting = None  # Clear the current meeting
-        host.status = True  # Set the host's status to available
-        host.save()  # Save the updated host instance
+            return HttpResponse(f"{meeting.visitor_name} already checked out!")
 
-        # Notify the next visitor
-        meeting.notify_next_visitor()
-
-        # Optionally, send a checkout notification email (if desired)
+        meeting.checkout()  # ✅ Handles: mark completed, update queue, notify next
         send_checkout_email(meeting)
-        
-        return HttpResponse(f"{meeting.visitor_name}, checked out successfully!")
-    
-    return HttpResponse("Invalid request method.")  # Handle invalid methods
 
+        return HttpResponse(f"{meeting.visitor_name} checked out successfully!")
+    return HttpResponse("Invalid request method.")
 
+# -------------------------------------------
+# SEND CHECKOUT EMAIL
+# -------------------------------------------
 def send_checkout_email(meeting):
-
-    # Explicitly define the Africa/Nairobi timezone
     nairobi_tz = pytz.timezone('Africa/Nairobi')
+    local_time_out = meeting.time_out.astimezone(nairobi_tz) if meeting.time_out else timezone.now().astimezone(nairobi_tz)
 
-    # Convert meeting.time_out to Africa/Nairobi timezone
-    if meeting.time_out:
-        local_time_out = meeting.time_out.astimezone(nairobi_tz)
-    else:
-        local_time_out = timezone.now().astimezone(nairobi_tz)  # Fallback if time_out is None
-
-    # Debug print for the time_out in different timezones
-    print(f"Original time_out (UTC): {meeting.time_out}")
-    print(f"Converted time_out (Nairobi): {local_time_out}")
-
-    # Prepare the checkout notification email
     subject = f"Visitor {meeting.visitor_name} Checked Out"
     message = (
         f"Dear {meeting.visitor_name},\n"
@@ -295,67 +143,59 @@ def send_checkout_email(meeting):
         f"on {local_time_out.strftime('%Y-%m-%d')}."
     )
     recipient_list = [meeting.visitor_email] if meeting.visitor_email else []
-    
-    # Send the email (ensure you have configured your email settings)
     send_mail(subject, message, 'jkatunge13@gmail.com', recipient_list, fail_silently=False)
 
-# Sends the email to both host and visitor
-def email(subject,visitor,rec,host=None):
-    ## FILL IN YOUR DETAILS HERE
+# -------------------------------------------
+# GENERAL EMAIL FUNCTION
+# -------------------------------------------
+def email(subject, visitor, rec, host=None):
     sender = 'jkatunge13@gmail.com'
-    if host:
-        html_content = render_to_string('visitor_mail_template.html', {'visitor':visitor,'host':host}) # render with dynamic value
-    else:
-        html_content = render_to_string('host_mail_template.html', {'visitor':visitor}) # render with dynamic value
-    
+    html_content = render_to_string(
+        'visitor_mail_template.html' if host else 'host_mail_template.html',
+        {'visitor': visitor, 'host': host}
+    )
     text_content = strip_tags(html_content)
-
-    # try except block to avoid wesite crashing due to email error
     try:
         msg = EmailMultiAlternatives(subject, text_content, sender, rec)
         msg.attach_alternative(html_content, "text/html")
         msg.send()
-        print(f"Email successfully sent to: {rec}")
+        print(f"Email sent to: {rec}")
     except Exception as e:
-        logging.error(f"Error sending email to {rec}: {e}")
-        print(f"Failed to send email: {e}")  # To log and see the error during development
+        logging.error(f"Email error: {e}")
+        print(f"Email error: {e}")
 
-
-# profile manager that saves host profile
+# -------------------------------------------
+# HOST PROFILE MANAGER
+# -------------------------------------------
 @login_required(login_url='/admin_login/')
 def profile_manager(request):
-    # Manage host profiles: add or edit
     if request.method == 'POST':
         form = Add_profile(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # Save the new host profile
+            form.save()
             return redirect('/dashboard')
     return redirect('/dashboard')
 
 @login_required(login_url='/admin_login/')
 def edit_profile(request):
-    # Edit an existing host profile
     if request.method == 'POST':
         host_id = request.POST.get('editing')
         instance = Host.objects.filter(id=host_id).first()
         form = Add_profile(request.POST, request.FILES, instance=instance)
         if form.is_valid():
-            form.save()  # Save the updated host profile
+            form.save()
             return redirect('/dashboard')
     return redirect('/dashboard')
 
 @login_required(login_url='/admin_login/')
 def edit_delete(request):
-    # Edit or delete host profiles based on user action
     if request.method == 'POST':
         host_id = request.POST.get('id')
         host = Host.objects.filter(id=host_id).first()
         if host:
-            # If editing, show the profile manager form
             if request.POST.get('edit'):
                 form = Add_profile(instance=host)
                 return render(request, 'profile_manager.html', {'form': form, 'edit': True, 'info': host_id})
-            # If deleting, remove the host profile
             elif request.POST.get('delete'):
                 host.delete()
                 return redirect('/dashboard')
